@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asistencia Janijim</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2; --surface: #ffffff; --ink: #1a1410; --ink2: #6b5e4e;
+    --accent: #c4622d; --green: #2d7a4f; --green-soft: #d4eddf;
+    --yellow: #b8860b; --yellow-soft: #fef9c3; --red: #b91c1c; --red-soft: #fee2e2;
+    --border: #e8ddd0; --shadow: 0 2px 16px rgba(70,40,10,0.08); --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+  header { background: var(--ink); color: #fff; padding: 28px 40px 24px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+  header .brand { flex: 1; min-width: 200px; }
+  header h1 { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+  header p.subtitle { color: #c9bfb0; font-size: 0.85rem; margin-top: 4px; font-weight: 300; }
+  .header-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .leyenda { display: flex; gap: 16px; flex-wrap: wrap; margin-left: auto; align-items: center; }
+  .leyenda-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #c9bfb0; font-weight: 500; }
+  .leyenda-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .controls { padding: 24px 40px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .select-wrapper { position: relative; flex: 1; max-width: 360px; min-width: 220px; }
+  select { width: 100%; appearance: none; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 44px 12px 18px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--ink); cursor: pointer; box-shadow: var(--shadow); transition: border-color 0.2s; font-weight: 500; }
+  select:focus { outline: none; border-color: var(--accent); }
+  .select-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--ink2); font-size: 0.8rem; }
+  .stats-strip { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat-badge { display: flex; align-items: center; gap: 7px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 999px; padding: 7px 16px; font-size: 0.82rem; font-weight: 500; color: var(--ink2); box-shadow: var(--shadow); }
+  .stat-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .stat-dot.verde { background: var(--green); }
+  .stat-dot.amarillo { background: var(--yellow); }
+  .stat-dot.rojo { background: var(--red); }
+  .stat-num { font-weight: 700; color: var(--ink); font-size: 0.9rem; }
+  .state-msg { text-align: center; padding: 80px 20px; color: var(--ink2); font-size: 1rem; }
+  .state-msg .icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+  .state-msg strong { display: block; font-family: 'Fraunces', serif; font-size: 1.3rem; color: var(--ink); margin-bottom: 6px; }
+  .content { padding: 32px 40px; max-width: 1100px; margin: 0 auto; }
+  .month-block { margin-bottom: 36px; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .month-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .month-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 700; color: var(--ink); text-transform: capitalize; }
+  .month-line { flex: 1; height: 1px; background: var(--border); }
+  .month-total { font-size: 0.8rem; color: var(--ink2); font-weight: 500; }
+  .days-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .day-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; min-width: 115px; box-shadow: 0 1px 6px rgba(70,40,10,0.06); transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+  .day-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(70,40,10,0.12); }
+  .day-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+  .day-card.presente::before { background: var(--green); }
+  .day-card.tarde::before { background: var(--yellow); }
+  .day-card.ausente::before { background: var(--red); }
+  .day-fecha { font-size: 0.82rem; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+  .day-tipo { font-size: 0.72rem; color: var(--ink2); margin-bottom: 8px; font-weight: 400; }
+  .day-estado { display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .day-estado.presente { background: var(--green-soft); color: var(--green); }
+  .day-estado.tarde { background: var(--yellow-soft); color: var(--yellow); }
+  .day-estado.ausente { background: var(--red-soft); color: var(--red); }
+  .day-estado .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .btn-refresh { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 12px 22px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(196,98,45,0.3); transition: background 0.2s, transform 0.1s; }
+  .btn-refresh:hover { background: #a8511f; transform: translateY(-1px); }
+  .btn-refresh.loading { opacity: 0.7; pointer-events: none; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-box { background: var(--red-soft); border: 1.5px solid #fca5a5; border-radius: var(--radius); padding: 20px 24px; color: var(--red); font-size: 0.9rem; margin: 24px 40px; }
+  .error-box strong { display: block; margin-bottom: 4px; }
+  @media (max-width: 600px) { header, .controls, .content { padding-left: 20px; padding-right: 20px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1><span class="header-dot"></span>Asistencia Janijim</h1>
+    <p class="subtitle">Registro mensual · M = Miércoles · T = Sábado tarde · N = Sábado noche</p>
+  </div>
+  <div class="leyenda">
+    <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--green)"></div> Presente</div>
+    <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--yellow)"></div> Tarde</div>
+    <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--red)"></div> Ausente</div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="select-wrapper">
+    <select id="selectJanij" disabled>
+      <option value="">— Cargando datos... —</option>
+    </select>
+    <span class="select-arrow">▾</span>
+  </div>
+  <button class="btn-refresh" id="btnRefresh" onclick="loadData()">
+    <span class="spinner" id="spinner" style="display:none"></span>
+    <span id="btnText">↻ Actualizar</span>
+  </button>
+  <div class="stats-strip" id="statsStrip" style="display:none">
+    <div class="stat-badge"><div class="stat-dot verde"></div><span class="stat-num" id="statPresente">0</span> presente</div>
+    <div class="stat-badge"><div class="stat-dot amarillo"></div><span class="stat-num" id="statTarde">0</span> tarde</div>
+    <div class="stat-badge"><div class="stat-dot rojo"></div><span class="stat-num" id="statAusente">0</span> ausente</div>
+    <div class="stat-badge">🎯 <span class="stat-num" id="statPct">0%</span> asistencia</div>
+  </div>
+</div>
+
+<div id="errorBox" style="display:none" class="error-box">
+  <strong>⚠ Error al cargar datos</strong>
+  <span id="errorMsg"></span>
+</div>
+
+<div class="content" id="mainContent">
+  <div class="state-msg">
+    <span class="icon">📋</span>
+    <strong>Cargando planilla...</strong>
+    Conectando con Google Sheets
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwMwFILmEs1k_f6YYx-2PgkAI_H4uWpZ53FBGsU_5A_QaqxhA6Vu89anQhW6wodLPPj/exec';
+  const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  let allData = [], janijList = [];
+
+  function estadoDesdeValor(v) {
+    const n = parseFloat(v);
+    if (isNaN(n)) return null;
+    if (n >= 1) return 'presente';
+    if (n === 0.5) return 'tarde';
+    if (n === 0) return 'ausente';
+    return null;
+  }
+
+  function labelEstado(e) {
+    return e === 'presente' ? 'Presente' : e === 'tarde' ? 'Tarde' : 'Ausente';
+  }
+
+  function setLoading(on) {
+    document.getElementById('spinner').style.display = on ? 'inline-block' : 'none';
+    document.getElementById('btnText').textContent = on ? 'Cargando…' : '↻ Actualizar';
+    document.getElementById('btnRefresh').classList.toggle('loading', on);
+  }
+
+  function parseFecha(raw) {
+    if (!raw) return null;
+    const s = String(raw).trim();
+    const dm = s.match(/Date\((\d+),(\d+),(\d+)\)/);
+    if (dm) return new Date(parseInt(dm[1]), parseInt(dm[2]), parseInt(dm[3]));
+    const sm = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (sm) {
+      let anio = parseInt(sm[3]);
+      if (anio < 100) anio += 2000;
+      return new Date(anio, parseInt(sm[2]) - 1, parseInt(sm[1]));
+    }
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+  }
+
+  async function loadData() {
+    setLoading(true);
+    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('mainContent').innerHTML = '<div class="state-msg"><span class="icon">⏳</span><strong>Cargando...</strong>Obteniendo datos</div>';
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error('Error HTTP ' + res.status);
+      const rows = await res.json();
+      parseAndRender(rows);
+    } catch(e) {
+      document.getElementById('errorBox').style.display = 'block';
+      document.getElementById('errorMsg').textContent = ' ' + e.message;
+      document.getElementById('mainContent').innerHTML = '<div class="state-msg"><span class="icon">🔒</span><strong>No se pudo cargar</strong>Verificá el Apps Script</div>';
+    } finally { setLoading(false); }
+  }
+
+  function parseAndRender(rows) {
+    // Fila 0: IDJanij | Nombre | TOTAL | T | M | T | M | N | ...  (tipos)
+    // Fila 1: (vacío) | (vacío) | (vacío) | 15/3/25 | 19/3/25 | ...  (fechas)
+    // Fila 2+: 118 | Agustin Said | 66 | 1 | 1 | 0.5 | ...
+    allData = []; janijList = [];
+
+    if (!rows || rows.length < 3) {
+      document.getElementById('mainContent').innerHTML = '<div class="state-msg"><span class="icon">📭</span><strong>Sin datos</strong>Formato inesperado</div>';
+      return;
+    }
+
+    const tipoRow  = rows[0];
+    const fechaRow = rows[1];
+
+    const fechaCols = [];
+    for (let i = 3; i < fechaRow.length; i++) {
+      const tipo  = String(tipoRow[i]  || '').trim().toUpperCase();
+      const fRaw  = String(fechaRow[i] || '').trim();
+      if (!fRaw) continue;
+      fechaCols.push({ idx: i, tipo, fecha: parseFecha(fRaw), rawLabel: fRaw });
+    }
+
+    for (let r = 2; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row || !row[1]) continue;
+      const nombre = String(row[1]).trim();
+      if (!nombre || nombre.toLowerCase() === 'nombre') continue;
+      if (!janijList.includes(nombre)) janijList.push(nombre);
+      for (const fc of fechaCols) {
+        const raw = row[fc.idx];
+        if (raw === null || raw === undefined || raw === '') continue;
+        const numVal = parseFloat(raw);
+        if (isNaN(numVal)) continue;
+        allData.push({ janij: nombre, fecha: fc.fecha, rawLabel: fc.rawLabel, tipo: fc.tipo, valor: numVal });
+      }
+    }
+
+    janijList.sort();
+    const sel = document.getElementById('selectJanij');
+    sel.innerHTML = '<option value="">— Seleccioná un janij —</option>';
+    janijList.forEach(j => {
+      const o = document.createElement('option');
+      o.value = j; o.textContent = j;
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+    sel.onchange = () => renderJanij(sel.value);
+    document.getElementById('mainContent').innerHTML = '<div class="state-msg"><span class="icon">👆</span><strong>Seleccioná un janij</strong>' + janijList.length + ' janijim cargados</div>';
+  }
+
+  function renderJanij(nombre) {
+    const content = document.getElementById('mainContent');
+    document.getElementById('statsStrip').style.display = 'none';
+    if (!nombre) { content.innerHTML = '<div class="state-msg"><span class="icon">👆</span><strong>Seleccioná un janij</strong></div>'; return; }
+
+    const registros = allData.filter(d => d.janij === nombre);
+    if (!registros.length) { content.innerHTML = '<div class="state-msg"><span class="icon">📭</span><strong>Sin registros</strong></div>'; return; }
+
+    const porMes = {};
+    for (const r of registros) {
+      const key = r.fecha ? r.fecha.getFullYear() + '-' + String(r.fecha.getMonth()).padStart(2,'0') : 'sin-fecha';
+      if (!porMes[key]) porMes[key] = { mesNum: r.fecha ? r.fecha.getMonth() : -1, anio: r.fecha ? r.fecha.getFullYear() : 0, items: [] };
+      porMes[key].items.push(r);
+    }
+
+    let totalP=0, totalT=0, totalA=0;
+    for (const r of registros) {
+      const e = estadoDesdeValor(r.valor);
+      if (e==='presente') totalP++; else if (e==='tarde') totalT++; else if (e==='ausente') totalA++;
+    }
+    const total = totalP + totalT + totalA;
+    const pct = total > 0 ? Math.round(((totalP + totalT*0.5)/total)*100) : 0;
+    document.getElementById('statPresente').textContent = totalP;
+    document.getElementById('statTarde').textContent = totalT;
+    document.getElementById('statAusente').textContent = totalA;
+    document.getElementById('statPct').textContent = pct + '%';
+    document.getElementById('statsStrip').style.display = 'flex';
+
+    let html = '';
+    for (const key of Object.keys(porMes).sort()) {
+      const { mesNum, anio, items } = porMes[key];
+      const mesLabel = mesNum >= 0 ? MESES_ES[mesNum] + ' ' + anio : 'Sin fecha';
+      items.sort((a,b) => (a.fecha||0)-(b.fecha||0));
+      html += '<div class="month-block"><div class="month-header"><span class="month-title">' + mesLabel + '</span><div class="month-line"></div><span class="month-total">' + items.length + ' clases</span></div><div class="days-grid">';
+      for (const it of items) {
+        const estado = estadoDesdeValor(it.valor);
+        if (!estado) continue;
+        const diaStr = it.fecha ? it.fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}) : it.rawLabel;
+        const tipoLabel = it.tipo==='M'?'Miércoles':it.tipo==='T'?'Sáb. tarde':it.tipo==='N'?'Sáb. noche':it.tipo;
+        html += '<div class="day-card ' + estado + '"><div class="day-fecha">' + diaStr + '</div><div class="day-tipo">' + tipoLabel + '</div><div class="day-estado ' + estado + '"><div class="dot"></div>' + labelEstado(estado) + '</div></div>';
+      }
+      html += '</div></div>';
+    }
+    content.innerHTML = html;
+  }
+
+  loadData();
+</script>
+</body>
+</html>
